@@ -25,8 +25,14 @@ class Frame(QtGui.QMainWindow):
         self.offset = event.pos()
 
     def mouseMoveEvent(self, event):
-        x=event.globalX()
-        y=event.globalY()
+        x = event.globalX()
+        y = event.globalY()
         x_w = self.offset.x()
         y_w = self.offset.y()
         self.move(x-x_w, y-y_w)
+
+    def keyPressEvent(self, event):
+        if type(event) == QtGui.QKeyEvent and event.key() == QtCore.Qt.Key_A:
+            print('a')
+        if type(event) == QtGui.QKeyEvent and event.key() == QtCore.Qt.Key_S:
+            print('s')
