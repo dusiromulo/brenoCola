@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread
+from threading import Timer
 from pynput.keyboard import Key, Listener, KeyCode
 
 
@@ -14,17 +15,16 @@ class PasteEventSignal(QThread):
                       on_release=self.on_release) as self.listener:
             self.listener.join()
 
-    def on_press(self, key):
+    def toggle_key(self, key, toggled):
         if key == KeyCode(char="v"):
-            if self.pressed[Key.ctrl] and not self.pressed["v"]:
-                # EMIT SIGNAL
-                self.paste_signal.emit()
-                self.pressed["v"] = 1
+            self.pressed["v"] = toggled
         elif key == Key.ctrl:
-            self.pressed[Key.ctrl] = 1
+            self.pressed[Key.ctrl] = toggled
+
+    def on_press(self, key):
+        self.toggle_key(key, 1)
 
     def on_release(self, key):
-        if key == KeyCode(char="v"):
-            self.pressed["v"] = 0
-        elif key == Key.ctrl:
-            self.pressed[Key.ctrl] = 0
+        if self.pressed["v"] and self.pressed[Key.ctrl]:
+            Timer(0.1, lambda: self.paste_signal.emit()).start()
+        self.toggle_key(key, 0)
